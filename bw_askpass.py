@@ -4,7 +4,7 @@ from sh import rbw, ssh_keygen, ErrorReturnCode
 from pathlib import Path
 import os, re, sys
 
-KEY_PATTERN = re.compile(r" for (.+?): ")
+KEY_PATTERN = re.compile(r" for(?: key) '?(.+?)'?: ")
 RBW_ARGS = ["--folder", "ssh"]
 
 
