@@ -8,6 +8,18 @@ KEY_PATTERN = re.compile(r" for(?: key) '?(.+?)'?: ")
 RBW_ARGS = ["--folder", "ssh"]
 
 
+def bw_get(key: Path):
+    passphrase_cmd = rbw("get", *RBW_ARGS, key.name, _ok_code=[0, 1])
+    # Remove new line character
+    passphrase = str(passphrase_cmd)[:-1]
+    return passphrase
+
+
+def bw_exists(key: Path):
+    history_cmd = rbw("history", *RBW_ARGS, key.name, _ok_code=[0, 1])
+    return history_cmd.exit_code == 0 or b"no entry found" not in history_cmd.stderr
+
+
 def check_key(private_key: Path, passphrase: str):
     try:
         ssh_keygen(
@@ -20,14 +32,45 @@ def check_key(private_key: Path, passphrase: str):
         return False
 
 
-if __name__ == "__main__":
+def askpass():
     key = Path(KEY_PATTERN.search(sys.argv[1]).group(1))
+    print(f"Reading passphrase from Bitwarden vault for {key}")
 
-    passphrase_cmd = rbw("get", *RBW_ARGS, key.name, _ok_code=[0, 1])
-    # Remove new line character
-    passphrase = str(passphrase_cmd)[:-1]
+    passphrase = bw_get(key)
     # We need to check the passphrase ourself,
     # otherwise, ssh-add will call us indefinitely.
     if not check_key(key, passphrase):
         sys.exit(1)
     print(passphrase)
+
+
+def keygen():
+    try:
+        key = Path(sys.argv[sys.argv.index("-f") + 1])
+    except:
+        print("Key filename must be provided with -f", file=sys.stderr)
+        sys.exit(1)
+    if key.exists():
+        print("Key already exists", file=sys.stderr)
+        sys.exit(1)
+
+    # Check if it exists
+    if bw_exists(key):
+        print("Passphrase entry already exists in your vault", file=sys.stderr)
+        sys.exit(1)
+
+    # Add passphrase in bitwarden first
+    generate_command = rbw("generate", *RBW_ARGS, "20", key.name)
+    passphrase = str(generate_command)[:-1]
+    try:
+        ssh_keygen(*sys.argv[1:], "-N", passphrase, _fg=True)
+    except:
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    mode = Path(sys.argv[0]).name
+    if "askpass" in mode:
+        askpass()
+    elif "keygen" in mode:
+        keygen()
