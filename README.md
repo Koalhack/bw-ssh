@@ -10,6 +10,7 @@ This does **not** extract private keys. Private keys are, well, private, and sho
 - [rbw](https://github.com/doy/rbw). It's an implementation of Bitwarden in CLI, supporting both terminal and graphical master password dialog. It's way faster than the official implementation.
 
 ## Usage
-`SSH_ASKPASS_REQUIRE=prefer SSH_ASKPASS="bw_askpass.py" ssh-add /home/user/.ssh/test_ed25519`
+- `SSH_ASKPASS_REQUIRE=prefer SSH_ASKPASS="bw-askpass" ssh-add /home/user/.ssh/test_ed25519`
+- `SSH_ASKPASS_REQUIRE=prefer SSH_ASKPASS="bw-askpass" ssh -i /home/user/.ssh/test_ed25519 user@hostname`
 
 You can add environment variables in your shell profile.
