@@ -41,7 +41,7 @@ def askpass():
     # otherwise, ssh-add will call us indefinitely.
     if not check_key(key, passphrase):
         sys.exit(1)
-    print(passphrase)
+    print(passphrase, end="", flush=True)
 
 
 def keygen():
