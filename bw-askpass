@@ -34,7 +34,7 @@ def check_key(private_key: Path, passphrase: str):
 
 def askpass():
     key = Path(KEY_PATTERN.search(sys.argv[1]).group(1))
-    print(f"Reading passphrase from Bitwarden vault for {key}")
+    print(f"Reading passphrase from Bitwarden vault for {key}", file=sys.stderr)
 
     passphrase = bw_get(key)
     # We need to check the passphrase ourself,
