@@ -6,6 +6,7 @@ import os, re, sys
 
 KEY_PATTERN = re.compile(r" for(?: key)? '?(.+?)'?: ")
 RBW_ARGS = ["--folder", "ssh"]
+RBW_GEN_ARGS = RBW_ARGS + ["--uri", "https://putty.software"]
 
 def bw_get(key: Path):
     passphrase_cmd = rbw("get", *RBW_ARGS, key.name, _ok_code=[0, 1])
@@ -18,7 +19,7 @@ def bw_exists(key: Path):
     return history_cmd.exit_code == 0 or b"no entry found" not in history_cmd.stderr
 
 def bw_gen(key: Path):
-    generate_command = rbw("generate", *RBW_ARGS, "20", key.name)
+    generate_command = rbw("generate", *RBW_GEN_ARGS, "20", key.name)
     passphrase = str(generate_command)[:-1]
     return passphrase
 
