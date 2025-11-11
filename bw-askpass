@@ -14,7 +14,7 @@ def bw_get(key: Path):
     return passphrase
 
 def bw_exists(key: Path):
-    history_cmd = rbw("history", *RBW_ARGS, key.name, _ok_code=(0, 1))
+    history_cmd = rbw("history", *RBW_ARGS, key.name, _return_cmd=True, _ok_code=(0, 1))
     return history_cmd.exit_code == 0 or b"no entry found" not in history_cmd.stderr
 
 def bw_gen(key: Path):
